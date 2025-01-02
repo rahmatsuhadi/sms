@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +12,11 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,10 +34,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { DialogManageStock } from "../modal/manage_stock"
-import { DialogEditItem } from "../modal/edit_item"
-import { DialogDeleteItem } from "../modal/delete_item"
+} from "@/components/ui/table";
+import { DialogManageStock } from "../modal/manage_stock";
+import { DialogEditItem } from "../modal/edit_item";
+import { DialogDeleteItem } from "../modal/delete_item";
 
 const data: Produk[] = [
   {
@@ -45,26 +45,24 @@ const data: Produk[] = [
     createAt: "10 mei 2020",
     description: "menjaga Agar tetap tidak mati sampai kapan pun",
     name: "Sony A 1000",
-    stock: 0
+    stock: 0,
   },
   {
     _id: "2",
     createAt: "10 mei 2020",
     description: "menjaga Agar tetap tidak mati sampai kapan pun",
     name: "AC",
-    stock: 10
-  }
-
-]
+    stock: 10,
+  },
+];
 
 export type Produk = {
-    _id : string
-    stock: number
-    name: string
-    description:string
-    createAt:string
-}
-
+  _id: string;
+  stock: number;
+  name: string;
+  description: string;
+  createAt: string;
+};
 
 export const columns: ColumnDef<Produk>[] = [
   {
@@ -100,7 +98,7 @@ export const columns: ColumnDef<Produk>[] = [
           Name Item
           <ArrowUpDown />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
   },
@@ -115,76 +113,89 @@ export const columns: ColumnDef<Produk>[] = [
           Description
           <ArrowUpDown />
         </Button>
-      )
+      );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("description")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("description")}</div>
+    ),
   },
   {
     accessorKey: "stock",
     header: () => <div className="text-right">Stock</div>,
     cell: ({ row }) => {
-      const stock = parseFloat(row.getValue("stock"))
+      const stock = parseFloat(row.getValue("stock"));
 
       // Format the stock as a dollar stock
-    //   const formatted = new Intl.NumberFormat("en-US", {
-    //     style: "currency",
-    //     currency: "USD",
-    //   }).format(stock)
+      //   const formatted = new Intl.NumberFormat("en-US", {
+      //     style: "currency",
+      //     currency: "USD",
+      //   }).format(stock)
 
-      return <div className="text-right font-medium">{stock}</div>
+      return <div className="text-right font-medium">{stock}</div>;
     },
   },
-  
+
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-    //   const payment = row.original
-
-      const [isOpen, setIsOpen] = React.useState(false);
-
-      const [isOpenEdit,setIsOpenEdit] = React.useState(false);
-      const [isOpenDelete,setIsOpenDelete] = React.useState(false);
-
-      return (
-        <>
-        <DialogManageStock isOpen={isOpen} onClose={() =>setIsOpen(false)} />
-        <DialogEditItem isOpen={isOpenEdit} onClose={() =>setIsOpenEdit(false)}/>
-        <DialogDeleteItem isOpen={isOpenDelete} onClose={() =>setIsOpenDelete(false)}/>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setIsOpenEdit(true)}>
-              Edit Item
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() =>setIsOpen(true)}>
-                Manage Stock Item
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() =>setIsOpenDelete(true)}>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-                </>
-      )
+    cell: ({ }) => {
+      //   const payment = row.original
+      return <ActionButton />;
     },
   },
-]
+];
+
+function ActionButton() {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const [isOpenEdit, setIsOpenEdit] = React.useState(false);
+  const [isOpenDelete, setIsOpenDelete] = React.useState(false);
+
+  return (
+    <>
+      <DialogManageStock isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <DialogEditItem
+        isOpen={isOpenEdit}
+        onClose={() => setIsOpenEdit(false)}
+      />
+      <DialogDeleteItem
+        isOpen={isOpenDelete}
+        onClose={() => setIsOpenDelete(false)}
+      />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => setIsOpenEdit(true)}>
+            Edit Item
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setIsOpen(true)}>
+            Manage Stock Item
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsOpenDelete(true)}>
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+}
 
 export function DataTableDemo() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -203,7 +214,7 @@ export function DataTableDemo() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
@@ -238,7 +249,7 @@ export function DataTableDemo() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -258,7 +269,7 @@ export function DataTableDemo() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -318,5 +329,5 @@ export function DataTableDemo() {
         </div>
       </div>
     </div>
-  )
+  );
 }
