@@ -1,7 +1,6 @@
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
@@ -10,7 +9,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
   } from "@/components/ui/sidebar"
-import { Calendar, CandlestickChart, History, Home, Inbox, Package, PackagePlus } from "lucide-react"
+import { CandlestickChart, History,PackagePlus } from "lucide-react"
 
 
   

@@ -139,7 +139,7 @@ export const columns: ColumnDef<Produk>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
+    //   const payment = row.original
 
       const [isOpen, setIsOpen] = React.useState(false);
 
