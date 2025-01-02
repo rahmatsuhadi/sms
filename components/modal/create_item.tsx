@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useForm } from "react-hook-form"
 import CreateItemForm from "../form/create_item"
 
 export function DialogCreateItem() {
