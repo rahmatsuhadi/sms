@@ -47,7 +47,7 @@ export default async function handler(
         },
       });
 
-      const { password: pass, ...userWithoutPassword } = user;
+      const { password, ...userWithoutPassword } = user;
 
       res.status(200).json({ message: "OK", user: userWithoutPassword });
     } catch (error) {

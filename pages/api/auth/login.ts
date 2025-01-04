@@ -44,7 +44,7 @@ export default async function handler(
         return res.status(400).json({ message: "Invalid login" });
       }
 
-      const { password: pass, ...userWithoutPassword } = cekuser;
+      const { password, ...userWithoutPassword } = cekuser;
 
       const token = signToken({ id: cekuser.id, username: cekuser.username });
 
