@@ -6,7 +6,6 @@ import { PrismaClient, User } from "@prisma/client";
 import client from "@/lib/axios";
 import { toast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
-import { IUser } from "@/lib/type";
 import { tokenGetter, tokenRemove, tokenSetter } from "@/lib/token";
 import { useRouter } from "next/navigation";
 import { verifyToken } from "@/lib/jwt";
