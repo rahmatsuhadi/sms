@@ -1,3 +1,4 @@
+"use client"
 import {
     Sidebar,
     SidebarContent,
@@ -12,6 +13,7 @@ import {
   } from "@/components/ui/sidebar"
 import { CandlestickChart, ChevronUp, History,PackagePlus, User2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { useAuth } from "@/context/AuthProvider"
 
 
   
@@ -34,8 +36,13 @@ const items = [
   },
 ]
 
+
   
   export function AppSidebar() {
+
+
+    const {user, logout} = useAuth()
+
     return (
       <Sidebar className="">
          <SidebarHeader className="py-5 pl-10">
@@ -70,7 +77,7 @@ const items = [
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton>
-                      <User2 /> Username
+                      <User2 /> {user?.name }
                       <ChevronUp className="ml-auto" />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
@@ -81,7 +88,7 @@ const items = [
                     <DropdownMenuItem>
                       <span>Account</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem  onClick={logout}>
                       <span>Sign out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
