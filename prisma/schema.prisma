@@ -10,29 +10,29 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  username  String   @unique
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  username  String    @unique
   name      String?
   password  String
   items     Item[]
-  createdAt DateTime @default(now())
+  history   History[]
+  createdAt DateTime  @default(now())
 }
 
 model Item {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   stock       Int
-  createdBy   User     @relation(fields: [createdById], references: [id])
-  createdById String   @db.ObjectId
-  createdAt   DateTime @default(now())
-  categoryId  String   @db.ObjectId
-  category    Category @relation(fields: [categoryId], references: [id])
-  History History[]
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdById String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  categoryId  String    @db.ObjectId
+  category    Category  @relation(fields: [categoryId], references: [id])
+  history     History[]
 }
 
 model Category {
@@ -42,20 +42,20 @@ model Category {
   item      Item[]
 }
 
-
 enum HistoryType {
   IN
   OUT
 }
 
 model History {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  itemId String @db.ObjectId
-  amount Int
-  before Int
-  after Int
-  type HistoryType
-  item Item @relation(fields: [itemId], references: [id])
-  createdAt DateTime @default(now())
-  
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  itemId      String      @db.ObjectId
+  amount      Int
+  before      Int
+  after       Int
+  type        HistoryType
+  item        Item        @relation(fields: [itemId], references: [id])
+  createdById String      @db.ObjectId
+  createdBy   User        @relation(fields: [createdById], references: [id])
+  createdAt   DateTime    @default(now())
 }
