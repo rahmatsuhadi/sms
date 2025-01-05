@@ -1,21 +1,36 @@
 "use client";
 
 import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useAuth } from "@/context/AuthProvider";
+import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
+
+const formSchema = z.object({
+  username: z.string().min(4, {
+    message: "Username must be at least 4 characters.",
+  }),
+  password: z.string().min(4, {
+    message: "Password must be at least 4 characters.",
+  }),
+});
+
+
 
 export default function FormLogin() {
-  const formSchema = z.object({
-    username: z.string().min(2, {
-      message: "Username must be at least 4 characters.",
-    }),
-    password: z.string().min(6, {
-      message: "Password must be at least 6 characters.",
-    }),
-  });
+
+  const [loading,setLoading] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -25,7 +40,13 @@ export default function FormLogin() {
     },
   });
 
-  const onSubmit = () => {};
+  const { login } = useAuth();
+
+  const onSubmit = async(val: z.infer<typeof formSchema>) => {
+    setLoading(true)
+    await login(val.username, val.password);
+    setLoading(false)
+  };
 
   return (
     <Form {...form}>
@@ -39,7 +60,7 @@ export default function FormLogin() {
               <FormControl>
                 <Input placeholder="Username" {...field} />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -52,11 +73,17 @@ export default function FormLogin() {
               <FormControl>
                 <Input type="password" placeholder="*******" {...field} />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">Login</Button>
+        <Button type="submit" className="w-full">
+          {loading ? 
+          <LoaderCircle className="animate-spin"/>
+          :
+          "Login"
+          }
+        </Button>
       </form>
     </Form>
   );
