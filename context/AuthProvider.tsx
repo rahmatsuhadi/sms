@@ -1,71 +1,93 @@
-"use client"
+"use client";
 
 import { createContext, use, useContext, useEffect, useState } from "react";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
+import client from "@/lib/axios";
+import { toast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
+import { IUser } from "@/lib/type";
+import { tokenGetter, tokenRemove, tokenSetter } from "@/lib/token";
+import { useRouter } from "next/navigation";
+import { verifyToken } from "@/lib/jwt";
 
 interface AuthContextType {
-  user: any;
+  user: Omit<User, "password"> | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
-
-let secret = "SMS";
-
-const prisma = new PrismaClient();
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(
+    null
+  );
+  const router = useRouter();
+
+
+  const fetchUser = async() =>{
+    try {
+      const {data:reponseUser} = await client.get<{message:string,user:User}>("/api/auth/me");
+      setUser(reponseUser.user)
+    } catch (error) {
+      logout()
+      router.replace("/")
+    }
+  }
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = tokenGetter();
 
     if (token) {
-      const result = jwt.decode(token);
-      setUser(result);
+      fetchUser()
     }
   }, []);
 
   const login = async (username: string, password: string) => {
-    const user = await prisma.user.findUnique({
-      where: { username: username },
-    });
+    try {
+      const { data } = await client.post<{ token: string; user: User }>(
+        "/api/auth/login",
+        {
+          username: username,
+          password: password,
+        }
+      );
+      tokenSetter(data.token);
+      setUser(data.user);
+      router.replace("/dashboard");
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
 
-    if (!user || !bcrypt.compareSync(password, user.password)) {
-      throw new Error("Invalid");
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: err.response?.data.message,
+      });
     }
-
-    const token = jwt.sign(
-      { id: user.id, name: user.name, username: user.username },
-      secret,
-      { expiresIn: "1h" }
-    );
-
-    localStorage.setItem("token", token);
-
-    setUser({ id: user.id, name: user.name, username: user.username });
   };
 
-  const logout = () => {localStorage.removeItem("token"); setUser(null)}
+  const logout = () => {
+    tokenRemove()
+    setUser(null);
+    router.replace("/")
+  };
+
 
   return (
-    <AuthContext.Provider value={{user, login, logout}}>
-        {children}
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
     </AuthContext.Provider>
-  )
+  );
 };
 
+export const useAuth = () => {
+  const context = useContext(AuthContext);
 
-export const useAuth = () =>{
-    const context = useContext(AuthContext);
-
-    if(context == undefined){
-        throw new Error("use Auth must be used within an AuthProvider")
-    }
-    return context;
-}
+  if (context == undefined) {
+    throw new Error("use Auth must be used within an AuthProvider");
+  }
+  return context;
+};

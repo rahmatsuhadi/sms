@@ -1,6 +1,17 @@
 import FormLogin from "@/components/form/login";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+
+
+export default async function Home() {
+
+  
+  const token = await cookies();
+  if (token.get("token-sms")) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="w-full justify-center items-center h-screen flex-col flex">
 
