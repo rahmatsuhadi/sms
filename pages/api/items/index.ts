@@ -23,7 +23,23 @@ export default async function handler(
 ) {
   if (req.method == 'GET') {
     try {
-      const items = await prisma.item.findMany();
+      const items = await prisma.item.findMany({
+        include:{
+          category: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          createdBy:{
+            select: {
+              id:true,
+              name: true,
+              username: true
+            }
+          }
+        }
+      });
 
       res.status(200).json({ message: 'OK', items });
     } catch (error) {
