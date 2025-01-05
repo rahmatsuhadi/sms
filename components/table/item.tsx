@@ -39,11 +39,9 @@ import { DialogManageStock } from "../modal/manage_stock";
 import { DialogEditItem } from "../modal/edit_item";
 import { DialogDeleteItem } from "../modal/delete_item";
 import { useItem } from "@/hooks/useDataItem";
-import { Item } from "@prisma/client";
+import { Category, Item, User } from "@prisma/client";
 import { formatDateTimeToIndo } from "@/utlis/formatDate";
 import { DialogCreateItem } from "../modal/create_item";
-
-
 
 export const columns: ColumnDef<Item>[] = [
   {
@@ -81,46 +79,77 @@ export const columns: ColumnDef<Item>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="">{row.getValue("name")}</div>,
   },
-  
+  {
+    accessorKey: "category",
+    header: () => <div className="text-right">Category</div>,
+    cell: ({ row }) => {
+      const category = row.getValue("category") as Category;
+
+      return <div className="text-right font-medium">{category.name}</div>;
+    },
+  },
+
   {
     accessorKey: "stock",
-    header: () => <div className="text-right">Stock</div>,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="w-full justify-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Stock
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => {
       const stock = parseFloat(row.getValue("stock"));
-
-      // Format the stock as a dollar stock
-      //   const formatted = new Intl.NumberFormat("en-US", {
-      //     style: "currency",
-      //     currency: "USD",
-      //   }).format(stock)
-
-      return <div className="text-right font-medium">{stock}</div>;
+      return <div className="text-center font-medium">{stock}</div>;
+    },
+  },
+  {
+    accessorKey: "createdBy",
+    header: () => <div className="text-right">Created By</div>,
+    cell: ({ row }) => {
+      const createdBy = row.getValue("createdBy") as User;
+      return <div className="text-right font-medium">{createdBy.username}</div>;
     },
   },
   {
     accessorKey: "createdAt",
-    header: () => <div className="text-right">Created At</div>,
-    cell: ({ row}) => {
-      const date = row.getValue("createdAt") as string
+    header: ({ column }) => (
+      <Button
+        className="text-right w-full"
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Created At
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const date = row.getValue("createdAt") as string;
 
-      return <div className="text-right font-medium">{formatDateTimeToIndo(date)}</div>;
+      return (
+        <div className="text-center font-medium">
+          {formatDateTimeToIndo(date)}
+        </div>
+      );
     },
   },
 
   {
     id: "actions",
     enableHiding: false,
-    cell: ({row }) => {
-
+    cell: ({ row }) => {
       //   const payment = row.original
       return <ActionButton data={row.original} />;
     },
   },
 ];
 
-function ActionButton({data}:{data:Partial<Item>}) {
+function ActionButton({ data }: { data: Partial<Item> }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [isOpenEdit, setIsOpenEdit] = React.useState(false);
@@ -129,8 +158,10 @@ function ActionButton({data}:{data:Partial<Item>}) {
   return (
     <>
       <DialogManageStock
-      data={data}
-      isOpen={isOpen} onClose={() => setIsOpen(false)} />
+        data={data}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
       <DialogEditItem
         data={data}
         isOpen={isOpenEdit}
@@ -176,11 +207,7 @@ export function DataTableItem() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-
-
-  const {data, refetch} = useItem()
-
-
+  const { data, refetch } = useItem();
 
   const table = useReactTable({
     data,
@@ -203,121 +230,119 @@ export function DataTableItem() {
 
   return (
     <>
-    
-    <DialogCreateItem refetch={refetch}/>
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter Item name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+      <DialogCreateItem refetch={refetch} />
+      <div className="w-full">
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter Item name..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("name")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
                   return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
                   );
                 })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
     </>
-
   );
 }
