@@ -1,8 +1,9 @@
 
 "use client";
+import { Item } from "@prisma/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
 
-export function DialogDeleteItem({isOpen, onClose}:{isOpen:boolean, onClose:() => void}) {
+export function DialogDeleteItem({isOpen,data, onClose}:{data:Partial<Item>,isOpen:boolean, onClose:() => void}) {
   
 
   return (

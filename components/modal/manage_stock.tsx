@@ -15,6 +15,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Item } from "@prisma/client";
 
 
 
@@ -25,7 +26,7 @@ const formSchema = z.object({
   })
 
 
-export function DialogManageStock({isOpen, onClose}:{isOpen:boolean, onClose:() =>void}) {
+export function DialogManageStock({isOpen,data, onClose}:{isOpen:boolean,data:Partial<Item>, onClose:() =>void}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

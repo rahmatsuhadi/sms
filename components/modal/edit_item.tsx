@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Textarea } from "../ui/textarea";
+import { Item } from "@prisma/client";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -22,12 +23,12 @@ const formSchema = z.object({
   desciption: z.string(),
 });
 
-export function DialogEditItem({isOpen, onClose}:{isOpen:boolean, onClose:() => void}) {
+export function DialogEditItem({isOpen, onClose,data}:{data:Partial<Item>,isOpen:boolean, onClose:() => void}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      desciption: "",
-      name: "",
+      // desciption: "",
+      name: data.name,
     },
   });
 
@@ -60,7 +61,7 @@ export function DialogEditItem({isOpen, onClose}:{isOpen:boolean, onClose:() => 
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="desciption"
               render={({ field }) => (
@@ -72,7 +73,7 @@ export function DialogEditItem({isOpen, onClose}:{isOpen:boolean, onClose:() => 
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <Button type="submit" className="w-full">
               Save Item
