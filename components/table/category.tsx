@@ -35,26 +35,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-const data: Category[] = [
-  {
-    _id: "1",
-    createAt: "10 mei 2020",
-    name: "Elektronik",
-  },
-  {
-    _id: "2",
-    createAt: "10 mei 2020",
-    name: "Furniture",
-  }
-
-]
-
-export type Category = {
-    _id : string
-    name: string
-    createAt:string
-}
+import { useCategories } from "@/hooks/useCategories"
+import { Category } from "@prisma/client"
+import { DialogEditCategory } from "../modal/edit_category"
+import { DialogDeleteCategory } from "../modal/delete_category"
+import { DialogCreateCategory } from "../modal/create_category"
 
 
 export const columns: ColumnDef<Category>[] = [
@@ -99,11 +84,29 @@ export const columns: ColumnDef<Category>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original
+    cell: ({ row, table }) => {
+      const category = row.original
 
+      
+    const meta = (table.options.meta as any)
       return (
-        <DropdownMenu>
+       <ActionButton data={category} refetch={meta.refetch}/>
+      )
+    },
+  },
+]
+
+
+function ActionButton({data,refetch}:{data:Category, refetch:() => void}){
+  const [isOpenEdit, setIsOpenEdit] = React.useState<boolean>(false);
+  const [isOpenDelete, setIsOpenDelete] = React.useState<boolean>(false);
+
+  return(
+    <>
+    <DialogDeleteCategory data={data} refetch={refetch} onClose={() =>setIsOpenDelete(false)} isOpen={isOpenDelete}/>
+    <DialogEditCategory data={data} isOpen={isOpenEdit} onClose={() =>setIsOpenEdit(false)} refetch={refetch} />
+    
+    <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
@@ -113,19 +116,20 @@ export const columns: ColumnDef<Category>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment._id)}
+              onClick={() => setIsOpenEdit(true)}
             >
-              Copy payment ID
+              Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem className="text-red-500" onClick={() =>setIsOpenDelete(true)}>Delete</DropdownMenuItem>
+            {/* <DropdownMenuItem>View payment details</DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
-      )
-    },
-  },
-]
+    </>
+
+
+  )
+}
 
 export function DataTableCategory() {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -135,6 +139,8 @@ export function DataTableCategory() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+
+  const {data,error,loading, refetch} = useCategories()
 
   const table = useReactTable({
     data,
@@ -147,6 +153,9 @@ export function DataTableCategory() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    meta:{
+      refetch:() =>refetch()
+    },
     state: {
       sorting,
       columnFilters,
@@ -156,6 +165,8 @@ export function DataTableCategory() {
   })
 
   return (
+    <>
+      <DialogCreateCategory refetch={refetch}/>
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
@@ -236,7 +247,8 @@ export function DataTableCategory() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {loading ? "Loading.." : "No results."}
+                  
                 </TableCell>
               </TableRow>
             )}
@@ -268,5 +280,6 @@ export function DataTableCategory() {
         </div>
       </div>
     </div>
+    </>
   )
 }
