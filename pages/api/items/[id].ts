@@ -10,14 +10,16 @@ type ResponseData = {
 };
 
 const bodySchema = Yup.object().shape({
-  name: Yup.string().required(),
-  stock: Yup.number().required(),
-  categoryId: Yup.string().required(),
+  name: Yup.string().optional(),
+  stock: Yup.number().optional(),
+  categoryId: Yup.string().optional(),
+  amount: Yup.number().optional(),
+  type: Yup.string().oneOf(['IN', 'OUT']).optional(),
 });
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<ResponseData>
 ) {
   if (req.method == 'GET') {
     const itemId = req.query.id;
@@ -71,25 +73,74 @@ export default async function handler(
 
       const value = await bodySchema.validate(req.body);
 
-      const item = await prisma.item.update({
-        where: {
-          id: itemId as string,
-        },
-        data: {
-          name: value.name,
-          stock: value.stock,
-          category: {
-            connect: {
-              id: value.categoryId,
+      if (value.amount && value.type) {
+        let newStock = existingItem.stock;
+
+        newStock =
+          value.type === 'IN'
+            ? newStock + value.amount
+            : newStock - value.amount;
+
+        if (newStock < 0) {
+          return res.status(400).json({ message: 'Stock cannot be negative' });
+        }
+
+        await prisma.history.create({
+          data: {
+            item: {
+              connect: {
+                id: itemId as string,
+              },
+            },
+            amount: value.amount,
+            before: existingItem.stock,
+            after: newStock,
+            type: value.type,
+            createdBy: {
+              connect: {
+                id: auth.id,
+              },
             },
           },
-        },
-      });
+        });
 
-      if (item) {
-        res.status(200).json({ message: 'OK', items: [item] });
-      } else {
-        res.status(404).json({ message: 'Item not found' });
+        const item = await prisma.item.update({
+          where: {
+            id: itemId as string,
+          },
+          data: {
+            stock: newStock,
+          },
+        });
+
+        if (item) {
+          res.status(200).json({ message: 'OK', items: [item] });
+        } else {
+          res.status(404).json({ message: 'Item not found' });
+        }
+      }
+
+      if (value.name || value.stock || value.categoryId) {
+        console.log(value);
+        const item = await prisma.item.update({
+          where: {
+            id: itemId as string,
+          },
+          data: {
+            name: value.name || existingItem.name,
+            category: {
+              connect: {
+                id: value.categoryId || existingItem.categoryId,
+              },
+            },
+          },
+        });
+
+        if (item) {
+          res.status(200).json({ message: 'OK', items: [item] });
+        } else {
+          res.status(404).json({ message: 'Item not found' });
+        }
       }
     } catch (error) {
       res.status(500).json({ message: 'Internal Server Error' });
@@ -126,7 +177,7 @@ export default async function handler(
         return res.status(403).json({ message: 'Forbidden' });
       }
 
-      await prisma.item.delete({
+      const i = await prisma.item.delete({
         where: {
           id: itemId as string,
         },

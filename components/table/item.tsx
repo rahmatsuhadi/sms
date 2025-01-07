@@ -142,35 +142,39 @@ export const columns: ColumnDef<Item>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       //   const payment = row.original
-      return <ActionButton data={row.original} />;
+      const meta = (table.options.meta as any);
+      return <ActionButton data={row.original} refetch={meta.refetch} />;
     },
   },
 ];
 
-function ActionButton({ data }: { data: Partial<Item> }) {
+function ActionButton({ data, refetch }: { data: Partial<Item>, refetch: () => void }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [isOpenEdit, setIsOpenEdit] = React.useState(false);
   const [isOpenDelete, setIsOpenDelete] = React.useState(false);
-
+  
   return (
     <>
       <DialogManageStock
         data={data}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
+        refetch={refetch}
       />
       <DialogEditItem
         data={data}
         isOpen={isOpenEdit}
         onClose={() => setIsOpenEdit(false)}
+        refetch={refetch}
       />
       <DialogDeleteItem
         data={data}
         isOpen={isOpenDelete}
         onClose={() => setIsOpenDelete(false)}
+        refetch={refetch}
       />
 
       <DropdownMenu>
@@ -219,6 +223,9 @@ export function DataTableItem() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    meta: {
+      refetch: () => refetch(),
+    },
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,

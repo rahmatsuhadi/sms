@@ -15,15 +15,21 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Textarea } from "../ui/textarea";
 import { Item } from "@prisma/client";
+import { useEditItem } from "@/hooks/useDataItem";
+import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Item Name must be at least 2 characters.",
   }),
-  desciption: z.string(),
+  // desciption: z.string(),
 });
 
-export function DialogEditItem({isOpen, onClose,data}:{data:Partial<Item>,isOpen:boolean, onClose:() => void}) {
+export function DialogEditItem({isOpen, onClose, data, refetch}:{data:Partial<Item>,isOpen:boolean, onClose:() => void, refetch:()=>void}) {
+  const {mutate} = useEditItem();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,9 +37,18 @@ export function DialogEditItem({isOpen, onClose,data}:{data:Partial<Item>,isOpen
       name: data.name,
     },
   });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    if (!data.id) return
+    const request = await mutate(data.id,{
+      name:values.name
+    });
+    if (request) {
+      onClose();
+      refetch();
+    }
+    setIsLoading(false);
   }
 
   return (
@@ -76,7 +91,7 @@ export function DialogEditItem({isOpen, onClose,data}:{data:Partial<Item>,isOpen
             /> */}
 
             <Button type="submit" className="w-full">
-              Save Item
+            {isLoading ? <LoaderCircle className="animate-spin" /> : "Save Item"}
             </Button>
           </form>
         </Form>

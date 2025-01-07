@@ -16,6 +16,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Item } from "@prisma/client";
+import { useManageStock } from "@/hooks/useDataItem";
+import { useState } from "react";
 
 
 
@@ -26,7 +28,10 @@ const formSchema = z.object({
   })
 
 
-export function DialogManageStock({isOpen,data, onClose}:{isOpen:boolean,data:Partial<Item>, onClose:() =>void}) {
+export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolean,data:Partial<Item>, onClose:() =>void, refetch:()=>void}) {
+  const {mutate} = useManageStock();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,8 +40,19 @@ export function DialogManageStock({isOpen,data, onClose}:{isOpen:boolean,data:Pa
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    setIsLoading(true);
+    if (!data.id) return
+    const request = await mutate(data.id, {
+      amount: values.amount,
+      type: values.type == "add" ? "IN" : "OUT"
+    });
+    if (request) {
+      onClose();
+      refetch();
+    }
+    setIsLoading(false);
   }
 
   return (
@@ -64,7 +80,13 @@ export function DialogManageStock({isOpen,data, onClose}:{isOpen:boolean,data:Pa
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                <Input type="number" placeholder="Amount" {...field} />
+                  <Input 
+                    type="number" 
+                    placeholder="Amount" 
+                    {...field} 
+                    value={field.value} 
+                    onChange={(e) => field.onChange(Number(e.target.value))
+                  }/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -77,7 +99,11 @@ export function DialogManageStock({isOpen,data, onClose}:{isOpen:boolean,data:Pa
               <FormItem>
                 <FormLabel>Action</FormLabel>
                 <FormControl>
-                <Select {...field}>
+                <Select 
+                  {...field}
+                  onValueChange={(value) => field.onChange(value)}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Type" />
                   </SelectTrigger>
