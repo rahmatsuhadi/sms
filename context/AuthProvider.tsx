@@ -9,6 +9,7 @@ import { AxiosError } from "axios";
 import { tokenGetter, tokenRemove, tokenSetter } from "@/lib/token";
 import { useRouter } from "next/navigation";
 import { verifyToken } from "@/lib/jwt";
+import Image from "next/image";
 
 interface AuthContextType {
   user: Omit<User, "password"> | null;
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(
     null
   );
+  const [loading, setLoading] = useState(true)
   const router = useRouter();
 
 
@@ -31,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const {data:reponseUser} = await client.get<{message:string,user:User}>("/api/auth/me");
       setUser(reponseUser.user)
+      setLoading(false)
     } catch (error) {
       logout()
       router.replace("/")
@@ -42,6 +45,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (token) {
       fetchUser()
+    }
+    else{
+      setLoading(false);
+      router.replace("/")
     }
   }, []);
 
@@ -77,7 +84,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
+      {loading ? (
+        <div className="w-screen h-screen flex justify-center items-center flex-col">
+          <Image src={"/loader.gif"} width={50} height={50} alt="Loader"/>
+          <h3 className="font-semibold text-xl">Please Wait</h3>
+        </div>
+      ) : children}
     </AuthContext.Provider>
   );
 };
