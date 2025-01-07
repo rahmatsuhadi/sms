@@ -35,41 +35,45 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { HistoryDataType, useHistory } from "@/hooks/useHistory"
+import { History, Item } from "@prisma/client"
+import { formatDateTimeToIndo } from "@/utlis/formatDate"
 
-const data: History[] = [
-  {
-    _id: "1",
-    createAt:"2025-01-02T14:03:22.205Z",
-    name: "Sony Alpa 5000",
-    status: "OUT",
-    stock_after: 10,
-    stock_before: 110,
-    amount: 100
-  },
-  {
-    _id: "2",
-    createAt: "2025-01-02T14:03:22.205Z",
-    name: "Furniture",
-    status: "IN",
-    stock_after: 90,
-    stock_before: 80,
-    amount: 10
-  }
+// const data: History[] = [
+//   {
+//     _id: "1",
+//     createAt:"2025-01-02T14:03:22.205Z",
+//     name: "Sony Alpa 5000",
+//     status: "OUT",
+//     stock_after: 10,
+//     stock_before: 110,
+//     amount: 100
+//   },
+//   {
+//     _id: "2",
+//     createAt: "2025-01-02T14:03:22.205Z",
+//     name: "Furniture",
+//     status: "IN",
+//     stock_after: 90,
+//     stock_before: 80,
+//     amount: 10
+//   }
 
-]
+// ]
 
-export type History = {
-    _id : string
-    name: string
-    status: "IN" | "OUT"
-    stock_before: number
-    stock_after: number
-    amount: number
-    createAt:string
-}
+// export type History = {
+//     _id : string
+//     name: string
+//     status: "IN" | "OUT"
+//     stock_before: number
+//     stock_after: number
+//     amount: number
+//     createAt:string
+// }
 
 
-export const columns: ColumnDef<History>[] = [
+
+export const columns: ColumnDef<HistoryDataType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -105,10 +109,15 @@ export const columns: ColumnDef<History>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+    cell: ({ row }) =>{
+      const historyData = row.original
+      return(
+        <div className="lowercase">{historyData.item.name}</div>
+      )
+    },
   },
   {
-    accessorKey: "status",
+    accessorKey: "type",
     header: ({ column }) => {
       return (
         <Button
@@ -120,7 +129,7 @@ export const columns: ColumnDef<History>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="uppercase font-bold">{row.getValue("status")}</div>,
+    cell: ({ row }) => <div className="uppercase font-bold">{row.getValue("type")}</div>,
   },
 
   {
@@ -140,7 +149,7 @@ export const columns: ColumnDef<History>[] = [
   },
   
   {
-    accessorKey: "stock_before",
+    accessorKey: "before",
     header: ({ column }) => {
       return (
         <Button
@@ -152,11 +161,11 @@ export const columns: ColumnDef<History>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("stock_before")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("before")}</div>,
   },
   
   {
-    accessorKey: "stock_after",
+    accessorKey: "after",
     header: ({ column }) => {
       return (
         <Button
@@ -168,10 +177,10 @@ export const columns: ColumnDef<History>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("stock_after")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("after")}</div>,
   },
   {
-    accessorKey: "createAt",
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -183,7 +192,7 @@ export const columns: ColumnDef<History>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("createAt")}</div>,
+    cell: ({ row }) => <div className="lowercase">{formatDateTimeToIndo(row.getValue("createdAt"))}</div>,
   },
   
   {
@@ -203,7 +212,7 @@ export const columns: ColumnDef<History>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment._id)}
+              // onClick={() => navigator.clipboard.writeText(payment._id)}
             >
               Copy payment ID
             </DropdownMenuItem>
@@ -226,6 +235,8 @@ export function DataTableHistory() {
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
+  const {data,loading} = useHistory()
+  
   const table = useReactTable({
     data,
     columns,
@@ -326,7 +337,8 @@ export function DataTableHistory() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {loading ? 'Loading...' : "No results."}
+                  
                 </TableCell>
               </TableRow>
             )}
