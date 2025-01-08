@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, TrendingUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -42,6 +42,9 @@ import { useItem } from "@/hooks/useDataItem";
 import { Category, Item, User } from "@prisma/client";
 import { formatDateTimeToIndo } from "@/utlis/formatDate";
 import { DialogCreateItem } from "../modal/create_item";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export const columns: ColumnDef<Item>[] = [
   {
@@ -109,6 +112,15 @@ export const columns: ColumnDef<Item>[] = [
     },
   },
   {
+    accessorKey: "status",
+    header: () => <div className="text-right">Status</div>,
+    cell: ({ row }) => {
+      const stock = parseFloat(row.getValue("stock"));
+      return <div className="text-right font-medium">{stock ==0 ?"Out Stock" : stock<10 ? "Low Stock" : "Normal"}</div>;
+    },
+  },
+  
+  {
     accessorKey: "createdBy",
     header: () => <div className="text-right">Created By</div>,
     cell: ({ row }) => {
@@ -116,6 +128,8 @@ export const columns: ColumnDef<Item>[] = [
       return <div className="text-right font-medium">{createdBy.username}</div>;
     },
   },
+  
+  
   {
     accessorKey: "createdAt",
     header: ({ column }) => (
@@ -145,7 +159,14 @@ export const columns: ColumnDef<Item>[] = [
     cell: ({ row, table }) => {
       //   const payment = row.original
       const meta = (table.options.meta as any);
-      return <ActionButton data={row.original} refetch={meta.refetch} />;
+      return(
+        <div className="flex items-center gap-2">
+          <Link href={"/dashboard/item/" + row.original.id}>
+          <TrendingUp size={20}/>
+          </Link>
+          <ActionButton data={row.original} refetch={meta.refetch} />
+        </div>
+      );
     },
   },
 ];
@@ -237,8 +258,37 @@ export function DataTableItem() {
 
   return (
     <>
-      <DialogCreateItem refetch={refetch} />
       <div className="w-full">
+        
+      <div className="grid grid-cols-1 lg:grid-cols-3 my-5 gap-5">
+  <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
+    <CardHeader>
+      <CardTitle className="text-lg font-semibold text-zinc-800">Total Item</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <h2 className="text-2xl font-bold text-zinc-600">10 Item</h2>
+    </CardContent>
+  </Card>
+  <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
+    <CardHeader>
+      <CardTitle className="text-lg font-semibold text-zinc-800">Total Item Low Stock</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <h2 className="text-2xl font-bold text-zinc-600">5 Item</h2>
+    </CardContent>
+  </Card>
+  <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
+    <CardHeader>
+      <CardTitle className="text-lg font-semibold text-zinc-800">Total Item Out of Stock</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <h2 className="text-2xl font-bold text-zinc-600">3 Item</h2>
+    </CardContent>
+  </Card>
+</div>
+
+        
+      <DialogCreateItem refetch={refetch} />
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter Item name..."
@@ -257,7 +307,7 @@ export function DataTableItem() {
             <DropdownMenuContent align="end">
               {table
                 .getAllColumns()
-                .filter((column) => column.getCanHide())
+                .filter((column: { getCanHide: () => unknown; }) => column.getCanHide())
                 .map((column) => {
                   return (
                     <DropdownMenuCheckboxItem
