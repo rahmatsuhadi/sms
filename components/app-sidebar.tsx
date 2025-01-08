@@ -11,7 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
   } from "@/components/ui/sidebar"
-import { CandlestickChart, ChevronUp, History,PackagePlus, User2 } from "lucide-react"
+import { CandlestickChart, ChevronUp, History,Home,PackagePlus, User2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { useAuth } from "@/context/AuthProvider"
 import Link from "next/link"
@@ -21,8 +21,13 @@ import Link from "next/link"
 // Menu items.
 const items = [
   {
-    title: "Items",
+    title: "Home",
     url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Items",
+    url: "/dashboard/item",
     icon: CandlestickChart,
   },
   {
@@ -47,9 +52,11 @@ const items = [
     return (
       <Sidebar className="">
          <SidebarHeader className="py-5 pl-10">
+          <Link href={"/dashboard"}>
           <h2 className="font-bold text-xl">
           SMS Aplication
           </h2>
+          </Link>
           </SidebarHeader>
       <SidebarContent className="p-5">
         <SidebarGroup>
