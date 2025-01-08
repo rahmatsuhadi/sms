@@ -4,7 +4,7 @@ import { HistoryLine } from "@/components/chart/history";
 import { HistoryLine2 } from "@/components/chart/history2";
 import { HistoryLine3 } from "@/components/chart/history3";
 import { HistoryLine4 } from "@/components/chart/historyline4";
-import { ItemChart } from "@/components/chart/item";
+// import { ItemChart } from "@/components/chart/item";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function MainPage() {
@@ -32,7 +32,7 @@ export default function MainPage() {
           {/* <HistoryLine2/> */}
           {/* <Category2 /> */}
           <CategoryChart />
-          <ItemChart/>
+          {/* <ItemChart/> */}
         </div>
         <div className="grid grid-cols-1 gap-5">
           {/* <HistoryLine3 /> */}

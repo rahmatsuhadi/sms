@@ -1,9 +1,73 @@
 import client from "@/lib/axios";
-import { Item } from "@prisma/client";
+import { History, Item } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { toast } from "./use-toast";
 import { AxiosError } from "axios";
 import { set } from "zod";
+
+export interface DetailItem extends Item{
+  createdBy:{
+    name:string
+  },
+  category:{
+    name:string
+  },
+  _count:{
+    history:number
+  }
+}
+
+export const useItemById = (id:string) =>{
+  const [data, setData] = useState<DetailItem | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [error, setError] = useState<any>(null);
+
+  const fetch = async () => {
+    try {
+      const response = await client.get<{ items: DetailItem[] }>("/api/items/" + id);
+      setData(response.data.items[0]);
+    } catch (error) {
+      console.log("Error Fetching Items");
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  return { data, loading, error, refetch: fetch }
+}
+
+
+export const useItemHistoryById = (id:string) =>{
+  const [data, setData] = useState<History[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [error, setError] = useState<any>(null);
+
+  const fetch = async () => {
+    try {
+      const response = await client.get<{ histories: History[] }>("/api/items/" + id + "/history-data");
+      setData(response.data.histories);
+    } catch (error) {
+      console.log("Error Fetching Items");
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  return { data, loading, error, refetch: fetch }
+}
+
 
 export const useItem = () => {
   const [data, setData] = useState<Item[]>([]);

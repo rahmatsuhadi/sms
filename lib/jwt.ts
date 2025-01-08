@@ -6,7 +6,7 @@ const SECRET = process.env["SECRET"] || "default";
 export type userPayload = Omit<User, "password" | "createdAt"| "name">;
 
 function signToken(payload: userPayload): string {
-  const token = jwt.sign(payload, SECRET, { expiresIn: "1h" });
+  const token = jwt.sign(payload, SECRET, { expiresIn: "1d" });
   return token;
 }
 

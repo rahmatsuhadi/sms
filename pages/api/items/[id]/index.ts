@@ -26,6 +26,21 @@ export default async function handler(
 
     try {
       const item = await prisma.item.findUnique({
+        include:{
+          _count:true,
+          category:{
+            select:{
+              id: true,
+              name: true
+            }
+          },
+          createdBy:{
+            select:{
+              id: true,
+              name: true
+            }
+          }
+        },
         where: {
           id: itemId as string,
         },
