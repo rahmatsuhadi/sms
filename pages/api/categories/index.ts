@@ -18,7 +18,11 @@ export default async function handler(
 ) {
   if (req.method == 'GET') {
     try {
-      const categories = await prisma.category.findMany({});
+      const categories = await prisma.category.findMany({
+        include:{
+          _count: true
+        }
+      });
 
       res.status(200).json({ message: 'OK', categories });
     } catch (error) {
