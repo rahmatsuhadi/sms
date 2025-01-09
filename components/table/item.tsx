@@ -123,7 +123,7 @@ export const columns: ColumnDef<Item>[] = [
       const stock = parseFloat(row.getValue("stock"));
       return (
         <div className="text-right font-medium">
-          {stock == 0 ? "Out Stock" : stock < 10 ? "Low Stock" : "Normal"}
+          {stock == 0 ? "Out Stock" :  stock < row.original.lowStockThreshold ? "Low Stock" : "Normal"}
         </div>
       );
     },
@@ -246,7 +246,7 @@ export function DataTableItem() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const { data, refetch } = useItem();
+  const { data, refetch ,loading} = useItem();
 
   const table = useReactTable({
     data,
@@ -388,7 +388,7 @@ export function DataTableItem() {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    {loading ? "Loading..." : "No results."}
                   </TableCell>
                 </TableRow>
               )}

@@ -113,7 +113,18 @@ export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolea
                 <FormControl>
                 <Select 
                   {...field}
-                  onValueChange={(value) => field.onChange(value)}
+                  onValueChange={(value) => {
+                    
+                    field.onChange(value)
+                    const amount = form.getValues("amount");                    
+                      if(value=="add"){
+                        setAfterStock(data.stock + Number(amount))
+                      }
+                      else{
+                        setAfterStock(data.stock - Number(amount))
+                      }                  
+                  }
+                  }
                   defaultValue={field.value}
                 >
                   <SelectTrigger className="w-full">

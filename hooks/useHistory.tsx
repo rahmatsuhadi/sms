@@ -1,9 +1,10 @@
 import client from "@/lib/axios";
-import { History, Item } from "@prisma/client";
+import { History, Item, User } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 export interface HistoryDataType extends History{
   item:Item
+  createdBy:User
 }
 
 export const useHistory = () => {

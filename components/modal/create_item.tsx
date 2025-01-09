@@ -188,8 +188,8 @@ export function DialogCreateItem({refetch}:{refetch:() =>void}) {
                       value={field.value}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
-                    <FormDescription>Set this value for alert threshold Stock  </FormDescription>
                   </FormControl>
+                    <FormDescription>Set this value for alert threshold Stock  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

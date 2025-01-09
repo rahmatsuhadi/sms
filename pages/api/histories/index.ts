@@ -25,6 +25,7 @@ export default async function handler(
     try {
       const histories = await prisma.history.findMany({
         include: {
+          createdBy:true,
           item: true,
         },
       });

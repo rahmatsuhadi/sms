@@ -36,7 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { HistoryDataType, useHistory } from "@/hooks/useHistory"
-import { History, Item } from "@prisma/client"
+import { History, Item, User } from "@prisma/client"
 import { formatDateTimeToIndo } from "@/utlis/formatDate"
 
 // const data: History[] = [
@@ -178,6 +178,25 @@ export const columns: ColumnDef<HistoryDataType>[] = [
       )
     },
     cell: ({ row }) => <div className="lowercase">{row.getValue("after")}</div>,
+  },
+  {
+    accessorKey: "User",
+    // header: ({ column }) => {
+    //   return (
+    //     <Button
+    //       variant="ghost"
+    //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //     >
+    //       Date
+    //       <ArrowUpDown />
+    //     </Button>
+    //   )
+    // },
+    cell: ({ row }) => {
+      const user = row.original.createdBy;
+
+      return <div className="">{user.name}</div>
+    },
   },
   {
     accessorKey: "createdAt",
