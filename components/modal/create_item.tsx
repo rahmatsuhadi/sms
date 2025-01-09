@@ -69,6 +69,7 @@ export function DialogCreateItem({refetch}:{refetch:() =>void}) {
       categoryId: values.category_id,
       name: values.name,
       stock: values.stock,
+      lowStockThreshold: values.lowStockThreshold
     });
     if (request) {
       setIsOpen(false);

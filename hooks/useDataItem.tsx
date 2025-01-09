@@ -106,6 +106,7 @@ export const useCreateItem = () => {
     name: string;
     categoryId: string;
     stock: number;
+    lowStockThreshold: number;
   }) => {
     try {
       await client.post<{ items: Item[] }>("/api/items", body);
@@ -137,7 +138,8 @@ export const useEditItem = () => {
   const [error, setError] = useState<any>(null);
 
   const mutate = async (id: string, body: {
-    name: string;
+    name: string,
+    lowStockThreshold:number
   }) => {
     try {
       await client.put<{ items: Item[] }>(`/api/items/${id}`, body);

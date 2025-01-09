@@ -138,7 +138,7 @@ export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolea
             <h4>{afterStock}</h4>
           </div>
 
-          <Button type="submit" className="w-full">{isLoading ? <LoaderIcon/> : "Process"}</Button>
+          <Button type="submit" className="w-full">{isLoading ? <LoaderIcon className="animate-spin"/> : "Process"}</Button>
         </form>
       </Form>
         

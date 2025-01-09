@@ -44,7 +44,8 @@ export function DialogEditItem({isOpen, onClose, data, refetch}:{data:Partial<It
     setIsLoading(true);
     if (!data.id) return
     const request = await mutate(data.id,{
-      name:values.name
+      name:values.name,
+      lowStockThreshold: values.lowStockThreshold
     });
     if (request) {
       onClose();
