@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "./use-toast";
 import { AxiosError } from "axios";
 import { set } from "zod";
+import { MonitorType } from "./useMonitor";
 
 export interface DetailItem extends Item{
   createdBy:{
@@ -43,16 +44,18 @@ export const useItemById = (id:string) =>{
 }
 
 
-export const useItemHistoryById = (id:string) =>{
-  const [data, setData] = useState<History[]>([]);
+
+
+export const useItemHistoryById = (id:string, range:string) =>{
+  const [data, setData] = useState<MonitorType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const [error, setError] = useState<any>(null);
 
   const fetch = async () => {
     try {
-      const response = await client.get<{ histories: History[] }>("/api/items/" + id + "/history-data");
-      setData(response.data.histories);
+      const response = await client.get<{ historyData: MonitorType[] }>("/api/items/" + id + "/history-data?type=" + range);
+      setData(response.data.historyData);
     } catch (error) {
       console.log("Error Fetching Items");
       setError(error);
@@ -63,7 +66,7 @@ export const useItemHistoryById = (id:string) =>{
 
   useEffect(() => {
     fetch();
-  }, []);
+  }, [range]);
 
   return { data, loading, error, refetch: fetch }
 }

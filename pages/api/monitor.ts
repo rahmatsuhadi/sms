@@ -1,16 +1,19 @@
+import { verifyToken } from "@/lib/jwt";
 import { prisma } from "@/lib/prisma";
+import { History, HistoryType } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import * as Yup from "yup";
 
 type ResponseData = {
   message: string;
   historyData?: {
-    date: string;
-    in: number;
-    out: number;
+    date:string,
+    in:number,
+    out:number
   }[];
   total?: number;
 };
+
 
 interface GroupedData {
   date: string;
@@ -26,8 +29,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  const itemId = req.query.id;
-
   if (req.method == "GET") {
     try {
       const now = new Date();
@@ -55,10 +56,9 @@ export default async function handler(
             lte: now.toISOString(),
             gte: selecttedType.toISOString(),
           },
-          itemId: itemId as string,
         },
-        orderBy: {
-          createdAt: "asc",
+        orderBy:{
+          createdAt:"asc"
         },
         select: {
           after: true,
@@ -71,42 +71,38 @@ export default async function handler(
         },
       });
 
-      const groupedData: { [key: string]: GroupedData } = histories.reduce(
-        (acc, history) => {
-          const date = history.createdAt.toISOString().split("T")[0]; // Mendapatkan tanggal
-          // console.log(date)
-          const amount = history.amount;
 
-          if (!acc[date]) {
-            acc[date] = { date: date, in: 0, out: 0 };
-          }
+      
+      const groupedData: { [key: string]: GroupedData } = histories.reduce((acc, history) => {
+        const date = history.createdAt.toISOString().split("T")[0]; // Mendapatkan tanggal
+        // console.log(date)
+        const amount = history.amount;
+      
+        if (!acc[date]) {
+          acc[date] = { date: date, in: 0, out: 0 };
+        }
+      
+        if (history.type === "IN") {
+          acc[date].in += amount;
+        } else if (history.type === "OUT") {
+          acc[date].out += amount;
+        }
+      
+        return acc;
+      }, {} as { [key: string]: GroupedData });
 
-          if (history.type === "IN") {
-            acc[date].in += amount;
-          } else if (history.type === "OUT") {
-            acc[date].out += amount;
-          }
 
-          return acc;
-        },
-        {} as { [key: string]: GroupedData }
-      );
+      const chartData:GroupedData[] = Object.values(groupedData).map(item => ({
+        date: item.date,
+        in: item.in,
+        out: item.out
+      }));
 
-      const chartData: GroupedData[] = Object.values(groupedData).map(
-        (item) => ({
-          date: item.date,
-          in: item.in,
-          out: item.out,
-        })
-      );
+
 
       res
         .status(200)
-        .json({
-          message: "OK",
-          historyData: chartData,
-          total: histories.length,
-        });
+        .json({ message: "OK", historyData:chartData, total: histories.length });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         res.status(400).json({ message: error.errors[0] });

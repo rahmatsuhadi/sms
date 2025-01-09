@@ -13,7 +13,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, TrendingUp } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  TrendingUp,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -116,10 +121,14 @@ export const columns: ColumnDef<Item>[] = [
     header: () => <div className="text-right">Status</div>,
     cell: ({ row }) => {
       const stock = parseFloat(row.getValue("stock"));
-      return <div className="text-right font-medium">{stock ==0 ?"Out Stock" : stock<10 ? "Low Stock" : "Normal"}</div>;
+      return (
+        <div className="text-right font-medium">
+          {stock == 0 ? "Out Stock" : stock < 10 ? "Low Stock" : "Normal"}
+        </div>
+      );
     },
   },
-  
+
   {
     accessorKey: "createdBy",
     header: () => <div className="text-right">Created By</div>,
@@ -128,8 +137,7 @@ export const columns: ColumnDef<Item>[] = [
       return <div className="text-right font-medium">{createdBy.username}</div>;
     },
   },
-  
-  
+
   {
     accessorKey: "createdAt",
     header: ({ column }) => (
@@ -158,11 +166,11 @@ export const columns: ColumnDef<Item>[] = [
     enableHiding: false,
     cell: ({ row, table }) => {
       //   const payment = row.original
-      const meta = (table.options.meta as any);
-      return(
+      const meta = table.options.meta as any;
+      return (
         <div className="flex items-center gap-2">
           <Link href={"/dashboard/item/" + row.original.id}>
-          <TrendingUp size={20}/>
+            <TrendingUp size={20} />
           </Link>
           <ActionButton data={row.original} refetch={meta.refetch} />
         </div>
@@ -171,12 +179,18 @@ export const columns: ColumnDef<Item>[] = [
   },
 ];
 
-function ActionButton({ data, refetch }: { data: Partial<Item>, refetch: () => void }) {
+function ActionButton({
+  data,
+  refetch,
+}: {
+  data: Partial<Item>;
+  refetch: () => void;
+}) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [isOpenEdit, setIsOpenEdit] = React.useState(false);
   const [isOpenDelete, setIsOpenDelete] = React.useState(false);
-  
+
   return (
     <>
       <DialogManageStock
@@ -259,36 +273,40 @@ export function DataTableItem() {
   return (
     <>
       <div className="w-full">
-        
-      <div className="grid grid-cols-1 lg:grid-cols-3 my-5 gap-5">
-  <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
-    <CardHeader>
-      <CardTitle className="text-lg font-semibold text-zinc-800">Total Item</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <h2 className="text-2xl font-bold text-zinc-600">10 Item</h2>
-    </CardContent>
-  </Card>
-  <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
-    <CardHeader>
-      <CardTitle className="text-lg font-semibold text-zinc-800">Total Item Low Stock</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <h2 className="text-2xl font-bold text-zinc-600">5 Item</h2>
-    </CardContent>
-  </Card>
-  <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
-    <CardHeader>
-      <CardTitle className="text-lg font-semibold text-zinc-800">Total Item Out of Stock</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <h2 className="text-2xl font-bold text-zinc-600">3 Item</h2>
-    </CardContent>
-  </Card>
-</div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 my-5 gap-5">
+          <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold text-zinc-800">
+                Total Item
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h2 className="text-2xl font-bold text-zinc-600">{data.length} Item</h2>
+            </CardContent>
+          </Card>
+          <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold text-zinc-800">
+                Total Item Low Stock
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h2 className="text-2xl font-bold text-zinc-600">{data.filter(item => item.stock < 10).length} Item</h2>
+            </CardContent>
+          </Card>
+          <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold text-zinc-800">
+                Total Item Out of Stock
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h2 className="text-2xl font-bold text-zinc-600">{data.filter(item => item.stock==0).length} Item</h2>
+            </CardContent>
+          </Card>
+        </div>
 
-        
-      <DialogCreateItem refetch={refetch} />
+        <DialogCreateItem refetch={refetch} />
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter Item name..."
@@ -307,7 +325,9 @@ export function DataTableItem() {
             <DropdownMenuContent align="end">
               {table
                 .getAllColumns()
-                .filter((column: { getCanHide: () => unknown; }) => column.getCanHide())
+                .filter((column: { getCanHide: () => unknown }) =>
+                  column.getCanHide()
+                )
                 .map((column) => {
                   return (
                     <DropdownMenuCheckboxItem

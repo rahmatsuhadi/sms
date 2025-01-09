@@ -169,7 +169,7 @@ export function ChartTotalItem({ data }: { data: DetailItem; id: string }) {
 
 const chartConfig = {
   visitors: {
-    label: "Visitors",
+    label: "History",
   },
   in: {
     label: "Stock In",
@@ -192,48 +192,8 @@ export function ChartLineHistoryItem({id}:{id:string}) {
   const [timeRange, setTimeRange] = React.useState("90d")
 
 
-  const {data} = useItemHistoryById(id)
-
-
-  const groupedData: { [key: string]: GroupedData } = data.reduce((acc, history) => {
-    const date = history.createdAt.toString().split("T")[0]; // Mendapatkan tanggal
-    const amount = history.amount;
-  
-    if (!acc[date]) {
-      acc[date] = { date: date, in: 0, out: 0 };
-    }
-  
-    if (history.type === "IN") {
-      acc[date].in += amount;
-    } else if (history.type === "OUT") {
-      acc[date].out += amount;
-    }
-  
-    return acc;
-  }, {} as { [key: string]: GroupedData });
-
-
-  const chartData:GroupedData[] = Object.values(groupedData).map(item => ({
-    date: item.date,
-    in: item.in,
-    out: item.out
-  }));
-
-  
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
-    let daysToSubtract = 90
-    if (timeRange === "30d") {
-      daysToSubtract = 30
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7
-    }
-    const startDate = new Date(referenceDate)
-    startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
-  })
-
+  const {data} = useItemHistoryById(id, timeRange)
+  console.log(data);
   return (
     <Card>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
@@ -268,7 +228,7 @@ export function ChartLineHistoryItem({id}:{id:string}) {
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={filteredData}>
+          <AreaChart data={data}>
             <defs>
               <linearGradient id="fillin" x1="0" y1="0" x2="0" y2="1">
                 <stop
