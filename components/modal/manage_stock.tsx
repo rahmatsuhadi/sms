@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Item } from "@prisma/client";
 import { useManageStock } from "@/hooks/useDataItem";
 import { useState } from "react";
+import { LoaderIcon } from "lucide-react";
 
 
 
@@ -28,9 +29,11 @@ const formSchema = z.object({
   })
 
 
-export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolean,data:Partial<Item>, onClose:() =>void, refetch:()=>void}) {
+export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolean,data:Item, onClose:() =>void, refetch:()=>void}) {
   const {mutate} = useManageStock();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [afterStock, setAfterStock] = useState<number>(data.stock)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,7 +44,6 @@ export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolea
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     setIsLoading(true);
     if (!data.id) return
     const request = await mutate(data.id, {
@@ -85,7 +87,17 @@ export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolea
                     placeholder="Amount" 
                     {...field} 
                     value={field.value} 
-                    onChange={(e) => field.onChange(Number(e.target.value))
+                    onChange={(e) => {
+                      field.onChange(Number(e.target.value))
+                      const type = form.getValues("type");                    
+                      if(type=="add"){
+                        setAfterStock(data.stock + Number(e.target.value))
+                      }
+                      else{
+                        setAfterStock(data.stock - Number(e.target.value))
+                      }
+
+                    }
                   }/>
                 </FormControl>
                 <FormMessage />
@@ -121,12 +133,12 @@ export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolea
 
           <div>
             <Label>Before</Label>
-            <h4 className="mb-4">100</h4>
+            <h4 className="mb-4">{data.stock}</h4>
             <Label>After</Label>
-            <h4>80</h4>
+            <h4>{afterStock}</h4>
           </div>
 
-          <Button type="submit" className="w-full">Process</Button>
+          <Button type="submit" className="w-full">{isLoading ? <LoaderIcon/> : "Process"}</Button>
         </form>
       </Form>
         

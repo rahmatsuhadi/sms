@@ -18,6 +18,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -42,6 +43,7 @@ const formSchema = z.object({
   }),
   // desciption: z.string(),
   stock: z.number().nonnegative(),
+  lowStockThreshold: z.number().nonnegative(),
 });
 
 export function DialogCreateItem({refetch}:{refetch:() =>void}) {
@@ -56,6 +58,7 @@ export function DialogCreateItem({refetch}:{refetch:() =>void}) {
       // desciption: '',
       name: "",
       stock: 1,
+      lowStockThreshold: 10,
       category_id: "",
     },
   });
@@ -165,6 +168,26 @@ export function DialogCreateItem({refetch}:{refetch:() =>void}) {
                       value={field.value}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lowStockThreshold"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Low Stock Alert</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Low Stock Alert"
+                      {...field}
+                      value={field.value}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                    <FormDescription>Set this value for alert threshold Stock  </FormDescription>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

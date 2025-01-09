@@ -27,7 +27,7 @@ model Item {
   id                String    @id @default(auto()) @map("_id") @db.ObjectId
   name              String
   stock             Int
-  lowStockThreshold Int?
+  lowStockThreshold Int
   createdBy         User      @relation(fields: [createdById], references: [id])
   createdById       String    @db.ObjectId
   createdAt         DateTime  @default(now())

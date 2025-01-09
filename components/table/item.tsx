@@ -183,7 +183,7 @@ function ActionButton({
   data,
   refetch,
 }: {
-  data: Partial<Item>;
+  data: Item;
   refetch: () => void;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -291,7 +291,7 @@ export function DataTableItem() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <h2 className="text-2xl font-bold text-zinc-600">{data.filter(item => item.stock < 10).length} Item</h2>
+              <h2 className="text-2xl font-bold text-zinc-600">{data.filter(item => item.stock < item.lowStockThreshold).length} Item</h2>
             </CardContent>
           </Card>
           <Card className="bg-zinc-100 shadow-lg transition-transform transform hover:scale-105">

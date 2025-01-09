@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Textarea } from "../ui/textarea";
 import { Item } from "@prisma/client";
 import { useEditItem } from "@/hooks/useDataItem";
@@ -23,6 +23,7 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "Item Name must be at least 2 characters.",
   }),
+  lowStockThreshold: z.number().nonnegative(),
   // desciption: z.string(),
 });
 
@@ -34,6 +35,7 @@ export function DialogEditItem({isOpen, onClose, data, refetch}:{data:Partial<It
     resolver: zodResolver(formSchema),
     defaultValues: {
       // desciption: "",
+      lowStockThreshold: data.lowStockThreshold,
       name: data.name,
     },
   });
@@ -71,6 +73,26 @@ export function DialogEditItem({isOpen, onClose, data, refetch}:{data:Partial<It
                   <FormLabel>Item Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Item Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lowStockThreshold"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Low Stock Alert</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Low Stock Alert"
+                      {...field}
+                      value={field.value}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                    <FormDescription>Set this value for alert threshold Stock  </FormDescription>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
