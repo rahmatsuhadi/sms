@@ -12,6 +12,7 @@ type ResponseData = {
 const bodySchema = Yup.object().shape({
   name: Yup.string().optional(),
   stock: Yup.number().optional(),
+  lowStockThreshold: Yup.number().optional(),
   categoryId: Yup.string().optional(),
   amount: Yup.number().optional(),
   type: Yup.string().oneOf(['IN', 'OUT']).optional(),
@@ -26,20 +27,20 @@ export default async function handler(
 
     try {
       const item = await prisma.item.findUnique({
-        include:{
-          _count:true,
-          category:{
-            select:{
+        include: {
+          _count: true,
+          category: {
+            select: {
               id: true,
-              name: true
-            }
+              name: true,
+            },
           },
-          createdBy:{
-            select:{
+          createdBy: {
+            select: {
               id: true,
-              name: true
-            }
-          }
+              name: true,
+            },
+          },
         },
         where: {
           id: itemId as string,
@@ -135,7 +136,12 @@ export default async function handler(
         }
       }
 
-      if (value.name || value.stock || value.categoryId) {
+      if (
+        value.name ||
+        value.stock ||
+        value.categoryId ||
+        value.lowStockThreshold
+      ) {
         console.log(value);
         const item = await prisma.item.update({
           where: {
@@ -143,6 +149,9 @@ export default async function handler(
           },
           data: {
             name: value.name || existingItem.name,
+            stock: value.stock || existingItem.stock,
+            lowStockThreshold:
+              value.lowStockThreshold || existingItem.lowStockThreshold,
             category: {
               connect: {
                 id: value.categoryId || existingItem.categoryId,

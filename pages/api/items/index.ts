@@ -14,6 +14,7 @@ type ResponseData = {
 const bodySchema = Yup.object().shape({
   name: Yup.string().required(),
   stock: Yup.number().required(),
+  lowStockThreshold: Yup.number().required(),
   categoryId: Yup.string().required(),
 });
 
@@ -24,21 +25,21 @@ export default async function handler(
   if (req.method == 'GET') {
     try {
       const items = await prisma.item.findMany({
-        include:{
+        include: {
           category: {
             select: {
               id: true,
-              name: true
-            }
-          },
-          createdBy:{
-            select: {
-              id:true,
               name: true,
-              username: true
-            }
-          }
-        }
+            },
+          },
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+            },
+          },
+        },
       });
 
       res.status(200).json({ message: 'OK', items });
@@ -67,6 +68,7 @@ export default async function handler(
         data: {
           name: value.name,
           stock: value.stock,
+          lowStockThreshold: value.lowStockThreshold,
           category: {
             connect: {
               id: value.categoryId,
