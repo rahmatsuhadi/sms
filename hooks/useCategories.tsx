@@ -4,15 +4,21 @@ import { useEffect, useState } from "react";
 import { toast } from "./use-toast";
 import { AxiosError } from "axios";
 
+export interface CategoryData extends Category{
+  _count:{
+    item:number
+  }
+}
+
 export const useCategories = () => {
-    const [data, setData] = useState<Category[]>([]);
+    const [data, setData] = useState<CategoryData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
   
     const [error, setError] = useState<any>(null);
   
     const fetch = async () => {
       try {
-        const response = await client.get<{ categories: Category[] }>("/api/categories/");
+        const response = await client.get<{ categories: CategoryData[] }>("/api/categories/");
         setData(response.data.categories);
       } catch (error) {
         console.log("Error Fetching Items");
