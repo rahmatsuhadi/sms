@@ -100,13 +100,16 @@ export const columns: ColumnDef<HistoryDataType>[] = [
     accessorKey: "name",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
+        // <Button
+        //   variant="ghost"
+        //   onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        // >
+          <div>
+
           Name
-          <ArrowUpDown />
-        </Button>
+          </div>
+        //   {/* <ArrowUpDown /> */}
+        // {/* </Button> */}
       )
     },
     cell: ({ row }) =>{
@@ -278,14 +281,14 @@ export function DataTableHistory() {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
+        {/* <Input
           placeholder="Filter Item name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
-        />
+        /> */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

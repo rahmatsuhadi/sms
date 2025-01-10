@@ -19,8 +19,11 @@ export default async function handler(
   if (req.method == 'GET') {
     try {
       const categories = await prisma.category.findMany({
-        include:{
-          _count: true
+        select:{
+          id: true,
+          name: true,
+          _count:true,
+          createdAt: true
         }
       });
 
