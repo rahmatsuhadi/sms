@@ -193,24 +193,30 @@ function ActionButton({
 
   return (
     <>
-      <DialogManageStock
-        data={data}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        refetch={refetch}
-      />
-      <DialogEditItem
-        data={data}
-        isOpen={isOpenEdit}
-        onClose={() => setIsOpenEdit(false)}
-        refetch={refetch}
-      />
-      <DialogDeleteItem
-        data={data}
-        isOpen={isOpenDelete}
-        onClose={() => setIsOpenDelete(false)}
-        refetch={refetch}
-      />
+      {isOpen && (        
+        <DialogManageStock
+          data={data}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          refetch={refetch}
+        />
+      )}
+      {isOpenEdit && (
+        <DialogEditItem
+          data={data}
+          isOpen={isOpenEdit}
+          onClose={() => setIsOpenEdit(false)}
+          refetch={refetch}
+        />
+      )}
+      {isOpenDelete && (
+        <DialogDeleteItem
+          data={data}
+          isOpen={isOpenDelete}
+          onClose={() => setIsOpenDelete(false)}
+          refetch={refetch}
+        />
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

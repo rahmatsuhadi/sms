@@ -24,6 +24,9 @@ export default async function handler(
           name: true,
           _count:true,
           createdAt: true
+        },
+        orderBy:{
+          createdAt: "desc"
         }
       });
 

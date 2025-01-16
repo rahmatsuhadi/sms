@@ -72,6 +72,7 @@ export function DialogCreateItem({refetch}:{refetch:() =>void}) {
       lowStockThreshold: values.lowStockThreshold
     });
     if (request) {
+      form.reset()
       setIsOpen(false);
       refetch()
     }

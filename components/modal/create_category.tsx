@@ -59,6 +59,7 @@ export function DialogCreateCategory({refetch}:{refetch:() =>void}) {
       name: values.name,
     });
     if (request) {
+      form.reset()
       setIsOpen(false);
       refetch()
     }

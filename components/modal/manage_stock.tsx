@@ -51,6 +51,7 @@ export function DialogManageStock({isOpen,data, onClose, refetch}:{isOpen:boolea
       type: values.type == "add" ? "IN" : "OUT"
     });
     if (request) {
+      form.reset()
       onClose();
       refetch();
     }

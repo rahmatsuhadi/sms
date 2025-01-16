@@ -103,8 +103,13 @@ function ActionButton({data,refetch}:{data:Category, refetch:() => void}){
 
   return(
     <>
-    <DialogDeleteCategory data={data} refetch={refetch} onClose={() =>setIsOpenDelete(false)} isOpen={isOpenDelete}/>
-    <DialogEditCategory data={data} isOpen={isOpenEdit} onClose={() =>setIsOpenEdit(false)} refetch={refetch} />
+    {isOpenDelete && (
+      <DialogDeleteCategory data={data} refetch={refetch} onClose={() =>setIsOpenDelete(false)} isOpen={isOpenDelete}/>
+
+    )}
+    {isOpenEdit && (
+      <DialogEditCategory data={data} isOpen={isOpenEdit} onClose={() =>setIsOpenEdit(false)} refetch={refetch} />
+    )}
     
     <DropdownMenu>
           <DropdownMenuTrigger asChild>
