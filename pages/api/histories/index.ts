@@ -28,6 +28,9 @@ export default async function handler(
           createdBy:true,
           item: true,
         },
+        orderBy:{
+          createdAt: "desc"
+        }
       });
 
       res.status(200).json({ message: 'OK', histories });
@@ -70,7 +73,7 @@ export default async function handler(
         },
         include: {
           item: true,
-        },
+        },      
       });
 
       res.status(200).json({ message: 'OK', histories: [history] });

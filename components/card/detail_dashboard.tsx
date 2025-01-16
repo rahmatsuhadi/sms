@@ -136,7 +136,7 @@ const chartConfig = {
 
 
 export function HistoryLineAll() {
-  const [timeRange, setTimeRange] = React.useState("7d")
+  const [timeRange, setTimeRange] = React.useState("30d")
 
 
   const {data} = useMonitor(timeRange)

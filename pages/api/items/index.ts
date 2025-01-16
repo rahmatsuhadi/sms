@@ -40,6 +40,9 @@ export default async function handler(
             },
           },
         },
+        orderBy: {
+          createdAt: "desc"
+        }
       });
 
       res.status(200).json({ message: 'OK', items });

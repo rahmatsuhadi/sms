@@ -55,7 +55,7 @@ export const useCheckStockTotal = () => {
     try {
       setLoading(true)
       const response = await client.get<{ data: ItemStock[] }>(
-        "/api/histories/analytic",
+        "/api/analytic",
         {
           params: {
             type: type,
